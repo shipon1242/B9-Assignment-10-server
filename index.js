@@ -1,22 +1,22 @@
 const express = require('express');
-// const cors = require('cors');
+const cors = require('cors');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config()
 const app = express()
 const port = process.env.PORT || 5001
 
 // middleware
-// app.use(cors())
-// app.use(express.json())
+app.use(cors())
+app.use(express.json())
 
 // mongodb
-// username:   potteryHouse
-// password :   0TooS6xrTewNEZOm
+
+
 
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.unjawmb.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-// console.log(uri)
+
 
 
 
@@ -31,11 +31,36 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+
+    const database = client.db("PotteryDb")
+    const craftCollection = database.collection("crafts")
+
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
+
+    app.post("/crafts", async (req, res) => {
+      const crafts = req.body
+      //  console.log(crafts)
+      const result = await craftCollection.insertOne(crafts)
+      res.send(result)
+
+    })
+    app.get("/crafts", async (req, res) => {
+      const cursor = craftCollection.find()
+
+      const result = await cursor.toArray()
+
+      res.send(result)
+
+
+
+    })
+
+
+
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
