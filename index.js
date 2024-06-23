@@ -57,12 +57,46 @@ async function run() {
 
 
     })
-    app.get('/crafts/:id',async(req,res)=>{
-      const id =req.params.id
-      const query ={_id: new ObjectId(id)}
-      const result =await craftCollection.findOne(query)
+    app.get('/crafts/:id', async (req, res) => {
+      const id = req.params.id
+      const query = { _id: new ObjectId(id) }
+      const result = await craftCollection.findOne(query)
       res.send(result)
     })
+    app.get('/myCrafts/:email', async (req, res) => {
+      const email = req.params.email
+      const query = { email: email }
+      const myCrafts = craftCollection.find(query)
+      const result = await myCrafts.toArray()
+      res.send(result)
+    })
+    app.put('/crafts/:id', async (req, res) => {
+      const id = req.params.id
+      const craft = req.body
+      // console.log(craft)
+      const filter = { _id: new ObjectId(id) }
+      const options = { upsert: true };
+      const updatedCraft = {
+        $set: {
+          image: craft.image,
+          item_name: craft.item_name,
+          short_description: craft.short_description,
+          subcategory_Name: craft.subcategory_Name,
+          price: craft.price,
+          rating: craft.rating,
+          customization: craft.customization,
+          processing_time: craft.processing_time,
+          stock_status: craft.stock_status,
+          made_by: craft.made_by
+        }
+      }
+      const result = await craftCollection.updateOne(filter, updatedCraft, options)
+      res.send(result)
+
+
+    })
+
+
 
 
 
