@@ -104,6 +104,36 @@ async function run() {
 
     })
 
+    app.get('/allCrafts',async(req,res)=>{
+      const allCrafts =  craftCollection.find();
+      const results = await allCrafts.toArray()
+      const page =parseInt(req.query.page)
+      const limit = parseInt(req.query.limit)
+      const startIndex = (page-1)*limit
+      const lastIndex =(page)*limit
+
+      const craftResult ={}
+      craftResult.totalCrafts = results.length
+      craftResult.pageCount = Math.ceil(results.length / limit)
+
+      if(lastIndex<results.length){
+        craftResult.next={
+          page:page+1
+        }
+      }
+      
+       if(startIndex>0){
+        craftResult.prev={
+          page:page-1
+        }
+       }
+     
+
+
+      craftResult. result = results.slice(startIndex,lastIndex)
+      res.json(craftResult)
+    })
+
 
 
 
