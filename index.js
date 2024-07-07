@@ -6,7 +6,16 @@ const app = express()
 const port = process.env.PORT || 5001
 
 // middleware
-app.use(cors())
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      
+      "https://assignment10-c6fa5.web.app",
+    ],
+  })
+);
+app.use(express.json());
 app.use(express.json())
 
 // mongodb
@@ -95,42 +104,42 @@ async function run() {
 
     })
 
-    app.delete('/crafts/:id',async(req,res)=>{
-       const id =req.params.id
-       const query ={ _id:new ObjectId(id) }
-       const result = await craftCollection.deleteOne(query)
-       res.send(result)
+    app.delete('/crafts/:id', async (req, res) => {
+      const id = req.params.id
+      const query = { _id: new ObjectId(id) }
+      const result = await craftCollection.deleteOne(query)
+      res.send(result)
 
 
     })
 
-    app.get('/allCrafts',async(req,res)=>{
-      const allCrafts =  craftCollection.find();
+    app.get('/allCrafts', async (req, res) => {
+      const allCrafts = craftCollection.find();
       const results = await allCrafts.toArray()
-      const page =parseInt(req.query.page)
+      const page = parseInt(req.query.page)
       const limit = parseInt(req.query.limit)
-      const startIndex = (page-1)*limit
-      const lastIndex =(page)*limit
+      const startIndex = (page - 1) * limit
+      const lastIndex = (page) * limit
 
-      const craftResult ={}
+      const craftResult = {}
       craftResult.totalCrafts = results.length
       craftResult.pageCount = Math.ceil(results.length / limit)
 
-      if(lastIndex<results.length){
-        craftResult.next={
-          page:page+1
+      if (lastIndex < results.length) {
+        craftResult.next = {
+          page: page + 1
         }
       }
-      
-       if(startIndex>0){
-        craftResult.prev={
-          page:page-1
+
+      if (startIndex > 0) {
+        craftResult.prev = {
+          page: page - 1
         }
-       }
-     
+      }
 
 
-      craftResult. result = results.slice(startIndex,lastIndex)
+
+      craftResult.result = results.slice(startIndex, lastIndex)
       res.json(craftResult)
     })
 
